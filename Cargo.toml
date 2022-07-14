@@ -1,0 +1,20 @@
+[package]
+name = "kiss-srt"
+version = "0.1.0"
+edition = "2018"
+rust-version = "1.46.0"
+
+# TODO: license, keywords, desc, etc.
+
+[dependencies]
+
+[dev-dependencies]
+clap = { version = "3.2.11", features = ["derive"] }
+criterion = "0.3"
+insta = "1.15.0"
+rand = "0.8.5"
+rand_chacha = "0.3"
+
+[[bench]]
+name = "parse"
+harness = false
