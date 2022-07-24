@@ -1,3 +1,20 @@
+// NOTE: I'm trying to keep the parser simple, so I'm avoiding a lot of optimizations that would
+// make either maintaining or using it more complex. The provided benchmark shows that the current
+// parser churns through data over 500 MiB/s on my computer, so I don't think there is much use. If
+// for whatever reason you _do_ need a ridiculously fast SRT parser, then these are my
+// recommendations:
+// - Enumerating the lines is used for providing feedback on what line parsing, but is costly
+//   - You could just rip it all out entirely
+//   - You could not keep track unless there is a failure then fallback and reparse to get more info
+// - Each `text` is a `String`, so that involves a lot of allocations
+//   - If you don't need mutations you could just use a `&str`
+//   - If you do need mutations then you could use a `Cow` (potentially a smaller one from `beef`)
+// - `parse_{two,three}_digit_ascii_num` probably isn't optimial
+//   - You could do wrapping shifts by `b'0'`, pack it into a number, and _then_ bounds check
+// - The timestamp line is a fixed length
+//   - You could verify length and then chunk out pieces instead of using an iterator
+//   - Maybe there could be some mask or something for quick validation
+
 use std::str::Bytes;
 
 use crate::{
@@ -33,41 +50,25 @@ fn parse_ascii_digit(b: u8) -> Option<u8> {
 // Of the form '01:23:45,678'
 fn parse_ts(bytes: &mut Bytes<'_>) -> Option<Timestamp> {
     let hours = parse_two_digit_ascii_num(bytes)?;
-
-    if bytes.next() != Some(b':') {
-        return None;
-    }
-
+    (bytes.next()? == b':').then_some(())?;
     let minutes = parse_two_digit_ascii_num(bytes)?;
-
-    if bytes.next() != Some(b':') {
-        return None;
-    }
-
+    (bytes.next()? == b':').then_some(())?;
     let seconds = parse_two_digit_ascii_num(bytes)?;
-
-    if bytes.next() != Some(b',') {
-        return None;
-    }
-
+    (bytes.next()? == b',').then_some(())?;
     let millis = parse_three_digit_ascii_num(bytes)?;
 
     Timestamp::new(hours, minutes, seconds, millis)
 }
 
 fn parse_ts_divider(bytes: &mut Bytes<'_>) -> Option<()> {
-    if &[
+    (&[
         bytes.next()?,
         bytes.next()?,
         bytes.next()?,
         bytes.next()?,
         bytes.next()?,
-    ] == b" --> "
-    {
-        Some(())
-    } else {
-        None
-    }
+    ] == b" --> ")
+        .then_some(())
 }
 
 pub fn from_str(subtitles: &str) -> Result<Vec<Subtitle>> {
@@ -95,7 +96,7 @@ pub fn from_str(subtitles: &str) -> Result<Vec<Subtitle>> {
         }
 
         // Parse the timestamp and duration
-        let (line_num, line) = lines.next().ok_or(Error::missing_ts_line(line_num + 1))?;
+        let (line_num, line) = lines.next().ok_or(Error::invalid_ts_line(line_num + 1))?;
         let mut bytes = line.bytes();
         let start = parse_ts(&mut bytes).ok_or(Error::invalid_ts_start(line_num))?;
         parse_ts_divider(&mut bytes).ok_or(Error::invalid_ts_divider(line_num))?;
@@ -104,19 +105,27 @@ pub fn from_str(subtitles: &str) -> Result<Vec<Subtitle>> {
             return Err(Error::ts_end_before_start(line_num));
         }
         let duration = end - start;
+        // Trailing bytes
+        if bytes.next() != None {
+            return Err(Error::invalid_ts_line(line_num));
+        }
 
         let mut text = lines
             .next()
+            .and_then(|(_, line)| {
+                let trimmed = line.trim_end_matches('\r');
+                (!trimmed.is_empty()).then_some(trimmed)
+            })
             .ok_or(Error::missing_text(line_num + 1))?
-            .1
             .to_owned();
         for (_, line) in lines.by_ref() {
-            if line.is_empty() {
+            let trimmed = line.trim_end_matches('\r');
+            if trimmed.is_empty() {
                 break;
             }
 
             text.push('\n');
-            text.push_str(line);
+            text.push_str(trimmed);
         }
 
         parsed.push(Subtitle {

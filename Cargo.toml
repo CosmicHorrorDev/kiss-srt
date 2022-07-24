@@ -9,9 +9,9 @@ rust-version = "1.46.0"
 [dependencies]
 
 [dev-dependencies]
-clap = { version = "3.2.11", features = ["derive"] }
 criterion = "0.3"
 insta = "1.15.0"
+pico-args = "0.5.0"
 rand = "0.8.5"
 rand_chacha = "0.3"
 

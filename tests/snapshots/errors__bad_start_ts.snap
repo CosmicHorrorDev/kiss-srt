@@ -1,0 +1,5 @@
+---
+source: tests/errors.rs
+expression: err.to_string()
+---
+Invalid starting timestamp on line 3

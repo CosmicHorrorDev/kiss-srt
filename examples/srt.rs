@@ -1,29 +1,72 @@
-use std::io::{self, Read};
+use std::{fs, path::PathBuf};
 
-use clap::{Parser, Subcommand};
+use pico_args::Arguments;
 
-#[derive(Debug, Parser)]
 struct Args {
-    #[clap(subcommand)]
     command: Command,
+    srt_path: PathBuf,
 }
 
-#[derive(Debug, Subcommand)]
 enum Command {
     /// Scale the timestamps by some factor (e.g. 1.25)
     Scale { value: f32 },
     /// Increase the timestamps by some value in ms
-    Increase { ms: u64 },
+    Increase { ms: u32 },
     /// Decrease the timestamps by some value in ms
-    Decrease { ms: u64 },
+    Decrease { ms: u32 },
+}
+
+const HELP: &str = "\
+srt <COMMAND> <SRT_PATH>
+Applies <COMMAND> to the SRT file piped to stdin
+
+COMMAND:
+    scale <VALUE>  Scale the timestamps by <VALUE> 
+    increase <MS>  Increase the timestamps by <MS>
+    decrease <MS>  Decrease the timestamps by <MS>
+
+ARGS:
+    <SRT_PATH>  Path to the srt file
+";
+
+fn parse_args() -> Args {
+    match try_parse_args() {
+        Some(args) => args,
+        None => {
+            eprintln!("{}", HELP);
+            std::process::exit(1);
+        }
+    }
+}
+
+fn try_parse_args() -> Option<Args> {
+    let mut args = Arguments::from_env();
+
+    let command = match args.subcommand().ok()??.as_str() {
+        "scale" => {
+            let value = args.free_from_str().ok()?;
+            Command::Scale { value }
+        }
+        "increase" => {
+            let ms = args.free_from_str().ok()?;
+            Command::Increase { ms }
+        }
+        "decrease" => {
+            let ms = args.free_from_str().ok()?;
+            Command::Decrease { ms }
+        }
+        _ => return None,
+    };
+
+    let srt_path = args.free_from_str().ok()?;
+
+    Some(Args { command, srt_path })
 }
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let Args { command } = Args::parse();
+    let Args { command, srt_path } = parse_args();
 
-    let mut stdin = io::stdin().lock();
-    let mut bytes = Vec::new();
-    stdin.read_to_end(&mut bytes)?;
+    let bytes = fs::read(&srt_path)?;
     // BOM-sniffing
     let text = std::str::from_utf8(if bytes.starts_with(b"\xef\xbb\xbf") {
         &bytes[3..]

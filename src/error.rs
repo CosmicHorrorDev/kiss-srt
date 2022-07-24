@@ -21,8 +21,8 @@ impl Error {
         Self::new_from_0_indexed_line(line, ErrorKind::InvalidId)
     }
 
-    pub(crate) fn missing_ts_line(line: usize) -> Self {
-        Self::new_from_0_indexed_line(line, ErrorKind::MissingTimestampLine)
+    pub(crate) fn invalid_ts_line(line: usize) -> Self {
+        Self::new_from_0_indexed_line(line, ErrorKind::InvalidTimestampLine)
     }
 
     pub(crate) fn invalid_ts_start(line: usize) -> Self {
@@ -57,7 +57,7 @@ impl std::error::Error for Error {}
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum ErrorKind {
     InvalidId,
-    MissingTimestampLine,
+    InvalidTimestampLine,
     InvalidTimestampStart,
     InvalidTimestampDivider,
     InvalidTimestampEnd,
@@ -69,10 +69,10 @@ impl fmt::Display for ErrorKind {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.write_str(match self {
             Self::InvalidId => "Invalid ID-marker",
-            Self::MissingTimestampLine => "Missing timestamp line",
-            Self::InvalidTimestampStart => "Invalid start timestamp",
+            Self::InvalidTimestampLine => "Invalid timestamp line",
+            Self::InvalidTimestampStart => "Invalid starting timestamp",
             Self::InvalidTimestampDivider => "Invalid timestamp divider",
-            Self::InvalidTimestampEnd => "Invalid end timestamp",
+            Self::InvalidTimestampEnd => "Invalid ending timestamp",
             Self::TimestampEndBeforeStart => "End timestamp is before start",
             Self::MissingText => "Missing text section",
         })

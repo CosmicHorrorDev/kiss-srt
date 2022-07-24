@@ -5,29 +5,34 @@ use std::{
     ops::{Add, AddAssign, Mul, MulAssign, Sub, SubAssign},
 };
 
-const MAX_HOURS: u64 = 100;
-const MINUTES_PER_HOUR: u64 = 60;
-const SECONDS_PER_MINUTE: u64 = 60;
-const MILLIS_PER_SECOND: u64 = 1_000;
+const MAX_HOURS: u32 = 100;
+const MINUTES_PER_HOUR: u32 = 60;
+const SECONDS_PER_MINUTE: u32 = 60;
+const MILLIS_PER_SECOND: u32 = 1_000;
 
 pub type Duration = Timestamp;
 
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq, PartialOrd, Ord, Hash)]
-pub struct Timestamp(u64);
+pub struct Timestamp(u32);
 
 impl Timestamp {
     pub const MAX: Self =
         Self(MAX_HOURS * MINUTES_PER_HOUR * SECONDS_PER_MINUTE * MILLIS_PER_SECOND - 1);
 
-    pub fn from_millis(total_millis: u64) -> Self {
-        Self(total_millis)
+    pub fn checked_from_millis(total_millis: u32) -> Option<Self> {
+        (Self(total_millis) <= Self::MAX).then_some(Self(total_millis))
+    }
+
+    pub fn from_millis(total_millis: u32) -> Self {
+        // Saturates the value to max
+        cmp::min(Self(total_millis), Self::MAX)
     }
 
     pub fn new(hours: u8, minutes: u8, seconds: u8, millis: u16) -> Option<Self> {
-        let hours = u64::from(hours);
-        let minutes = u64::from(minutes);
-        let seconds = u64::from(seconds);
-        let millis = u64::from(millis);
+        let hours = u32::from(hours);
+        let minutes = u32::from(minutes);
+        let seconds = u32::from(seconds);
+        let millis = u32::from(millis);
 
         if hours >= MAX_HOURS
             || minutes >= MINUTES_PER_HOUR
@@ -63,19 +68,19 @@ impl Timestamp {
         u16::try_from(millis).expect("Range is 0..1_000")
     }
 
-    pub fn total_hours(&self) -> u64 {
+    pub fn total_hours(&self) -> u32 {
         self.total_minutes() / MINUTES_PER_HOUR
     }
 
-    pub fn total_minutes(&self) -> u64 {
+    pub fn total_minutes(&self) -> u32 {
         self.total_seconds() / SECONDS_PER_MINUTE
     }
 
-    pub fn total_seconds(&self) -> u64 {
+    pub fn total_seconds(&self) -> u32 {
         self.total_millis() / MILLIS_PER_SECOND
     }
 
-    pub fn total_millis(&self) -> u64 {
+    pub fn total_millis(&self) -> u32 {
         self.0
     }
 }
@@ -117,7 +122,7 @@ macro_rules! gen_mul_float_traits {
 
             fn mul(self, rhs: $t) -> Self::Output {
                 let millis = self.0 as $t * rhs;
-                let millis = if millis >= 0.0 { millis as u64 } else { 0 };
+                let millis = if millis >= 0.0 { millis as u32 } else { 0 };
                 cmp::min(Self(millis), Timestamp::MAX)
             }
         }
@@ -155,6 +160,10 @@ mod tests {
         assert_eq!(Timestamp::MAX.to_string(), "99:59:59,999");
         // Saturates to max
         assert_eq!(Timestamp::MAX + Timestamp::from_millis(1), Timestamp::MAX);
+        assert_eq!(
+            Timestamp::from_millis(Timestamp::MAX.total_millis() + 1),
+            Timestamp::MAX
+        );
     }
 
     #[test]

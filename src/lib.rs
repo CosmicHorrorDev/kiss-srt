@@ -1,3 +1,5 @@
+// TODO: setup github actions
+
 pub mod error;
 mod parse;
 mod render;
@@ -10,7 +12,8 @@ pub use parse::from_str;
 pub use render::to_string;
 pub use time::{Duration, Timestamp};
 
-#[derive(Debug)]
+// NOTE: No `Default` because empty `text` is considered invalid, so it would be a silly default
+#[derive(Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct Subtitle {
     pub start: Timestamp,
     pub duration: Duration,
