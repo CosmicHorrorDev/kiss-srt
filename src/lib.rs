@@ -1,6 +1,6 @@
 // TODO: setup github actions
 
-pub mod error;
+mod error;
 mod parse;
 mod render;
 mod time;

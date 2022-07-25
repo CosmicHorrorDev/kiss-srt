@@ -2,4 +2,4 @@
 source: tests/errors.rs
 expression: err.to_string()
 ---
-Invalid starting timestamp on line 2
+Invalid timestamp divider on line 2
