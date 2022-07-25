@@ -9,40 +9,46 @@ pub struct Error {
 }
 
 impl Error {
-    fn new_from_0_indexed_line(line: usize, kind: ErrorKind) -> Self {
+    pub(crate) fn invalid_id(line: usize) -> Self {
         Self {
-            // Convert from 0-indexed to 1-indexed
-            line: line + 1,
-            kind,
+            line,
+            kind: ErrorKind::InvalidId,
         }
     }
 
-    pub(crate) fn invalid_id(line: usize) -> Self {
-        Self::new_from_0_indexed_line(line, ErrorKind::InvalidId)
-    }
-
     pub(crate) fn invalid_ts_line(line: usize) -> Self {
-        Self::new_from_0_indexed_line(line, ErrorKind::InvalidTimestampLine)
+        Self {
+            line,
+            kind: ErrorKind::InvalidTimestampLine,
+        }
     }
 
     pub(crate) fn invalid_ts_start(line: usize) -> Self {
-        Self::new_from_0_indexed_line(line, ErrorKind::InvalidTimestampStart)
+        Self {
+            line,
+            kind: ErrorKind::InvalidTimestampStart,
+        }
     }
 
     pub(crate) fn invalid_ts_divider(line: usize) -> Self {
-        Self::new_from_0_indexed_line(line, ErrorKind::InvalidTimestampDivider)
+        Self {
+            line,
+            kind: ErrorKind::InvalidTimestampDivider,
+        }
     }
 
     pub(crate) fn invalid_ts_end(line: usize) -> Self {
-        Self::new_from_0_indexed_line(line, ErrorKind::InvalidTimestampEnd)
+        Self {
+            line,
+            kind: ErrorKind::InvalidTimestampEnd,
+        }
     }
 
     pub(crate) fn ts_end_before_start(line: usize) -> Self {
-        Self::new_from_0_indexed_line(line, ErrorKind::TimestampEndBeforeStart)
-    }
-
-    pub(crate) fn missing_text(line: usize) -> Self {
-        Self::new_from_0_indexed_line(line, ErrorKind::MissingText)
+        Self {
+            line,
+            kind: ErrorKind::TimestampEndBeforeStart,
+        }
     }
 }
 
@@ -62,7 +68,6 @@ pub enum ErrorKind {
     InvalidTimestampDivider,
     InvalidTimestampEnd,
     TimestampEndBeforeStart,
-    MissingText,
 }
 
 impl fmt::Display for ErrorKind {
@@ -74,7 +79,6 @@ impl fmt::Display for ErrorKind {
             Self::InvalidTimestampDivider => "Invalid timestamp divider",
             Self::InvalidTimestampEnd => "Invalid ending timestamp",
             Self::TimestampEndBeforeStart => "End timestamp is before start",
-            Self::MissingText => "Missing text section",
         })
     }
 }

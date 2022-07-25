@@ -73,7 +73,7 @@ fn parse_ts_divider(bytes: &mut Bytes<'_>) -> Option<()> {
 
 pub fn from_str(subtitles: &str) -> Result<Vec<Subtitle>> {
     let mut parsed: Vec<Subtitle> = Vec::new();
-    let mut lines = subtitles.lines().enumerate();
+    let mut lines = (1..).zip(subtitles.lines());
 
     'outer: while let Some(mut pair) = lines.next() {
         'empty_line_eater: loop {
@@ -110,23 +110,30 @@ pub fn from_str(subtitles: &str) -> Result<Vec<Subtitle>> {
             return Err(Error::invalid_ts_line(line_num));
         }
 
-        let mut text = lines
+        let text = lines
             .next()
             .and_then(|(_, line)| {
                 let trimmed = line.trim_end_matches('\r');
-                (!trimmed.is_empty()).then_some(trimmed)
+                if trimmed.is_empty() {
+                    None
+                } else {
+                    Some(trimmed.to_owned())
+                }
             })
-            .ok_or(Error::missing_text(line_num + 1))?
-            .to_owned();
-        for (_, line) in lines.by_ref() {
-            let trimmed = line.trim_end_matches('\r');
-            if trimmed.is_empty() {
-                break;
-            }
+            .map(|mut text| {
+                for (_, line) in lines.by_ref() {
+                    let trimmed = line.trim_end_matches('\r');
+                    if trimmed.is_empty() {
+                        break;
+                    }
 
-            text.push('\n');
-            text.push_str(trimmed);
-        }
+                    text.push('\n');
+                    text.push_str(trimmed);
+                }
+
+                text
+            })
+            .unwrap_or_default();
 
         parsed.push(Subtitle {
             start,
