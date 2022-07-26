@@ -1,6 +1,4 @@
-use std::{fs, path::PathBuf};
-
-use pico_args::Arguments;
+use std::{env, fs, path::PathBuf};
 
 struct Args {
     srt_path: PathBuf,
@@ -25,8 +23,9 @@ fn parse_args() -> Args {
 }
 
 fn try_parse_args() -> Option<Args> {
-    let mut args = Arguments::from_env();
-    let srt_path = PathBuf::from(args.free_from_str::<String>().ok()?);
+    let mut args = env::args();
+    let _exe = args.next();
+    let srt_path = PathBuf::from(args.next()?);
     Some(Args { srt_path })
 }
 

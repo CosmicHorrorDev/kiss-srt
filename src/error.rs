@@ -1,10 +1,14 @@
 use std::fmt;
 
+/// A specialized [`Result`][std::result::Result] for [`kiss_srt::Error`][Error]
 pub type Result<T> = std::result::Result<T, Error>;
 
+/// Contains context on why parsing failed
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub struct Error {
+    /// The line number that failed parsing
     pub line: usize,
+    /// The kind of failure
     pub kind: ErrorKind,
 }
 
@@ -60,13 +64,20 @@ impl fmt::Display for Error {
 
 impl std::error::Error for Error {}
 
+/// Describes the kind of failure
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum ErrorKind {
+    /// The id contained something other than an ASCII digit
     InvalidId,
+    /// The timestamp line was either missing or had trailing bytes
     InvalidTimestampLine,
+    /// The starting timestamp doesn't match the format of '01:23:45,678'
     InvalidTimestampStart,
+    /// The timestamp divider doesn't match ' --> '
     InvalidTimestampDivider,
+    /// The ending timestamp doesn't match the format of '01:23:45,678'
     InvalidTimestampEnd,
+    /// The ending timestamp is before the start
     TimestampEndBeforeStart,
 }
 

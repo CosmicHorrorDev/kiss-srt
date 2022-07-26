@@ -71,6 +71,7 @@ fn parse_ts_divider(bytes: &mut Bytes<'_>) -> Option<()> {
         .then_some(())
 }
 
+/// Attempts to parse the provided text to a [`Vec`] of [`Subtitle`]s
 pub fn from_str(subtitles: &str) -> Result<Vec<Subtitle>> {
     let mut parsed: Vec<Subtitle> = Vec::new();
     let mut lines = (1..).zip(subtitles.lines());

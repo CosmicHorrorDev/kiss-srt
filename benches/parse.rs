@@ -1,7 +1,6 @@
 use criterion::{black_box, criterion_group, criterion_main, Criterion};
 use kiss_srt::{Subtitle, Timestamp};
-use rand::{prelude::*, Rng, SeedableRng};
-use rand_chacha::ChaCha8Rng;
+use oorandom::Rand64;
 
 // Sample text is made up of quotes from _The House of Leaves_ with varying length
 const TEXT: &[&str] = &[
@@ -59,22 +58,23 @@ const TEXT: &[&str] = &[
 // Yes the timestamps aren't increasing, but that doesn't matter for this parser
 fn gen_subtitles(num_items: u64) -> String {
     let mut subtitles = Vec::new();
-    let mut rng = ChaCha8Rng::seed_from_u64(0x9876_5432);
+    let mut rng = Rand64::new(0x1234_5678);
 
     for _ in 0..num_items {
         // Start between 0 and 2 hours, duration between 0 and 10 seconds
-        let start_millis = rng.gen_range(0..=Timestamp::new(2, 0, 0, 0).unwrap().total_millis());
-        let start = Timestamp::from_millis(start_millis);
-        let duration = Timestamp::from_millis(rng.gen_range(0..=10_000));
+        let start_millis =
+            rng.rand_range(0..Timestamp::new(2, 0, 0, 1).unwrap().total_millis() as u64);
+        let start = Timestamp::from_millis(start_millis as u32);
+        let duration = Timestamp::from_millis(rng.rand_range(0..10_001) as u32);
 
         // 2/3 chance for one line, 1/3 for two
-        let num_lines = match rng.gen_range(0..3) {
+        let num_lines = match rng.rand_range(0..3) {
             0 | 1 => 1,
             2 => 2,
             _ => panic!("Range only includes 0, 1, and 2"),
         };
         let text: String = (0..num_lines)
-            .map(|_| *TEXT.choose(&mut rng).expect("There are items in TEXT"))
+            .map(|_| TEXT[rng.rand_range(0..TEXT.len() as u64) as usize])
             .collect::<Vec<_>>()
             .join("\n");
 

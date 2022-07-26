@@ -1,6 +1,4 @@
-use std::{fs, path::PathBuf};
-
-use pico_args::Arguments;
+use std::{env, fs, path::PathBuf};
 
 struct Args {
     command: Command,
@@ -40,25 +38,25 @@ fn parse_args() -> Args {
 }
 
 fn try_parse_args() -> Option<Args> {
-    let mut args = Arguments::from_env();
+    let mut args = env::args();
 
-    let command = match args.subcommand().ok()??.as_str() {
+    let command = match args.next()?.as_str() {
         "scale" => {
-            let value = args.free_from_str().ok()?;
+            let value = args.next()?.parse().ok()?;
             Command::Scale { value }
         }
         "increase" => {
-            let ms = args.free_from_str().ok()?;
+            let ms = args.next()?.parse().ok()?;
             Command::Increase { ms }
         }
         "decrease" => {
-            let ms = args.free_from_str().ok()?;
+            let ms = args.next()?.parse().ok()?;
             Command::Decrease { ms }
         }
         _ => return None,
     };
 
-    let srt_path = args.free_from_str().ok()?;
+    let srt_path = PathBuf::from(args.next()?);
 
     Some(Args { command, srt_path })
 }
