@@ -4,7 +4,7 @@ macro_rules! snapshot_parse_err {
         #[test]
         fn $fn_name() {
             let err = kiss_srt::from_str($text).unwrap_err();
-            ::insta::assert_snapshot!(err.to_string());
+            ::insta::assert_display_snapshot!(err);
         }
         )*
     };

@@ -1,5 +1,5 @@
 ---
-source: tests/parsing.rs
+source: tests/integration_tests/parsing.rs
 expression: "kiss_srt::to_string(&scaled_up)"
 ---
 1

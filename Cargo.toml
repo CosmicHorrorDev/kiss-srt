@@ -2,16 +2,16 @@
 name = "kiss-srt"
 version = "0.1.0"
 edition = "2018"
-rust-version = "1.46.0"
+# TODO: check off this in CI
+rust-version = "1.38.0"
 
 # TODO: license, keywords, desc, etc.
 
 [dependencies]
 
 [dev-dependencies]
-criterion = { path = "../criterion.rs", default-features = false }
-# criterion = "0.3"
-insta = "1.15.0"
+criterion = "0.3"
+insta = "1.17"
 oorandom = "11.1.3"
 
 [lib]

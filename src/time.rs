@@ -82,7 +82,11 @@ impl Timestamp {
     /// );
     /// ```
     pub fn checked_from_millis(total_millis: u32) -> Option<Self> {
-        (Self(total_millis) <= Self::MAX).then_some(Self(total_millis))
+        if Self(total_millis) <= Self::MAX {
+            Some(Self(total_millis))
+        } else {
+            None
+        }
     }
 
     /// Constructs a timestamp saturating to `Timestamp::MAX`

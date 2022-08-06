@@ -1,0 +1,5 @@
+---
+source: tests/integration_tests/errors.rs
+expression: err.to_string()
+---
+Invalid timestamp line on line 2

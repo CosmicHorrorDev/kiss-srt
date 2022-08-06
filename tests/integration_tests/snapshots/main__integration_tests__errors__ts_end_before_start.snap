@@ -1,5 +1,5 @@
 ---
-source: tests/errors.rs
+source: tests/integration_tests/errors.rs
 expression: err.to_string()
 ---
 End timestamp is before start on line 2

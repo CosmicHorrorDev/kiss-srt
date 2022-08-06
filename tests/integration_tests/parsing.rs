@@ -66,5 +66,9 @@ const EMPTY_TEXT_SECTION: &str = "\
 #[test]
 fn empty_text_section() {
     let subtitles = kiss_srt::from_str(EMPTY_TEXT_SECTION).unwrap();
-    insta::assert_snapshot!(kiss_srt::to_string(&subtitles));
+    insta::assert_snapshot!(kiss_srt::to_string(&subtitles), @r###"
+    1
+    00:00:00,000 --> 11:11:11,111
+
+    "###);
 }

@@ -1,0 +1,15 @@
+---
+source: tests/integration_tests/parsing.rs
+expression: "kiss_srt::to_string(&decrease)"
+---
+1
+00:00:00,000 --> 00:01:23,456
+This is some sample
+text
+
+2
+00:02:34,467 --> 00:02:59,900
+3
+00:00:00,000 --> 11:11:11,111
+^^ Wow. That looks a lot like a subtitle, but it isn't
+
