@@ -5,7 +5,7 @@ use crate::Subtitle;
 /// Renders the `subtitles` to the SRT text representation
 ///
 /// ```
-/// # use kiss_srt::{Duration, Subtitle, Timestamp};
+/// # use kiss_srt::{time::{Duration, Timestamp}, Subtitle};
 /// let subtitles = vec![
 ///     Subtitle {
 ///         start: Timestamp::from_millis(0),

@@ -1,3 +1,5 @@
+use kiss_srt::time::Duration;
+
 const SANITY: &str = "
 1
 00:00:00,000 --> 00:01:23,456
@@ -25,7 +27,7 @@ fn mutations() {
         .clone()
         .into_iter()
         .map(|mut sub| {
-            sub.start += kiss_srt::Duration::from_millis(100);
+            sub.start += Duration::from_millis(100);
             sub
         })
         .collect();
@@ -35,7 +37,7 @@ fn mutations() {
         .clone()
         .into_iter()
         .map(|mut sub| {
-            sub.start -= kiss_srt::Duration::from_millis(100);
+            sub.start -= Duration::from_millis(100);
             sub
         })
         .collect();

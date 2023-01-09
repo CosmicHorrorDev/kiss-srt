@@ -31,16 +31,16 @@
 //! ";
 //!
 //! // 1. Parses some SRT text
-//! let subtitles = kiss_srt::from_str(SAMPLE_SRT_TEXT).unwrap();
+//! let mut subtitles = kiss_srt::from_str(SAMPLE_SRT_TEXT).unwrap();
 //! // 2. Removes the first and last entry
-//! let mut middle = match subtitles.as_slice() {
-//!     [_, middle @ .., _] => middle.to_owned(),
+//! let mut middle = match subtitles.as_mut_slice() {
+//!     [_, middle @ .., _] => middle,
 //!     _ => panic!("Needs at least two entries"),
 //! };
 //!
 //! // 3. Shifts all the timestamps up by 500ms
-//! for subtitle in &mut middle {
-//!     subtitle.start += kiss_srt::Duration::from_millis(500);
+//! for mut subtitle in middle.iter_mut() {
+//!     subtitle.start += kiss_srt::time::Duration::from_millis(500);
 //! }
 //!
 //! // 4. Renders back to SRT text
@@ -62,14 +62,13 @@
 //! There is beauty in simplicity 💕
 
 // TODO: setup github actions
-mod error;
+pub mod error;
 mod parse;
 mod render;
 mod time;
 
 use std::fmt::Display;
 
-pub use error::{Error, Result};
 pub use parse::from_str;
 pub use render::to_string;
 pub use time::{Duration, Timestamp};
@@ -86,8 +85,8 @@ pub use time::{Duration, Timestamp};
 /// deliberate tradeoff to keep rendering "infallible" while keeping the `text` easy to use
 #[derive(Clone, Debug, Default, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct Subtitle {
-    pub start: Timestamp,
-    pub duration: Duration,
+    pub start: time::Timestamp,
+    pub duration: time::Duration,
     pub text: String,
 }
 

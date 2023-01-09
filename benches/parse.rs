@@ -1,5 +1,5 @@
 use criterion::{black_box, criterion_group, criterion_main, Criterion};
-use kiss_srt::{Subtitle, Timestamp};
+use kiss_srt::{time::Timestamp, Subtitle};
 use oorandom::Rand64;
 
 // Sample text is made up of quotes from _The House of Leaves_ with varying length

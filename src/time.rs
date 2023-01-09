@@ -16,7 +16,7 @@ pub type Duration = Timestamp;
 /// Represents an SRT timestamp
 ///
 /// ```
-/// # use kiss_srt::Timestamp;
+/// # use kiss_srt::time::Timestamp;
 /// let ts = Timestamp::new(12, 34, 56, 789)
 ///     .expect("timestamp is within range");
 ///
@@ -40,7 +40,7 @@ pub type Duration = Timestamp;
 /// or up to [`Timestamp::MAX`]
 ///
 /// ```
-/// # use kiss_srt::{Duration, Timestamp};
+/// # use kiss_srt::time::{Duration, Timestamp};
 /// // Simple addition
 /// let half_sec = Timestamp::from_millis(500);
 /// let sec_and_a_half = half_sec + Duration::from_millis(1_000);
@@ -58,11 +58,15 @@ pub type Duration = Timestamp;
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct Timestamp(u32);
 
+// TODO: Make `Timestamp`'s debug formatting prettier
+
 impl Timestamp {
+    // TODO: include a `MIN`
+
     /// The max possible timestamp
     ///
     /// ```
-    /// # use kiss_srt::Timestamp;
+    /// # use kiss_srt::time::Timestamp;
     /// assert_eq!(Timestamp::MAX.to_string(), "99:59:59,999");
     /// ```
     pub const MAX: Self =
@@ -71,7 +75,7 @@ impl Timestamp {
     /// Attempts to construct a timestamp returning `None` when above `Timestamp::MAX`
     ///
     /// ```
-    /// # use kiss_srt::Timestamp;
+    /// # use kiss_srt::time::Timestamp;
     /// // Within the range
     /// assert!(Timestamp::checked_from_millis(1_234).is_some());
     /// // Just outside of the range
@@ -92,7 +96,7 @@ impl Timestamp {
     /// Constructs a timestamp saturating to `Timestamp::MAX`
     ///
     /// ```
-    /// # use kiss_srt::Timestamp;
+    /// # use kiss_srt::time::Timestamp;
     /// // Within the range
     /// assert_eq!(Timestamp::from_millis(1_234).total_millis(), 1_234);
     /// // Saturates to `Timestamp::MAX`
@@ -120,7 +124,7 @@ impl Timestamp {
     /// | `millis` | `0..1_000` |
     ///
     /// ```
-    /// # use kiss_srt::Timestamp;
+    /// # use kiss_srt::time::Timestamp;
     /// assert_eq!(
     ///     Timestamp::new(12, 34, 56, 789)
     ///         .expect("timestamp is within range")

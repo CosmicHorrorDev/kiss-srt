@@ -40,6 +40,9 @@ fn parse_args() -> Args {
 fn try_parse_args() -> Option<Args> {
     let mut args = env::args();
 
+    // the executable
+    let _ = args.next();
+
     let command = match args.next()?.as_str() {
         "scale" => {
             let value = args.next()?.parse().ok()?;
@@ -84,11 +87,11 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                 sub
             }
             Command::Increase { ms } => {
-                sub.start += kiss_srt::Duration::from_millis(ms);
+                sub.start += kiss_srt::time::Duration::from_millis(ms);
                 sub
             }
             Command::Decrease { ms } => {
-                sub.start -= kiss_srt::Duration::from_millis(ms);
+                sub.start -= kiss_srt::time::Duration::from_millis(ms);
                 sub
             }
         })

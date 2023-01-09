@@ -1,4 +1,4 @@
-use kiss_srt::Timestamp;
+use kiss_srt::time::Timestamp;
 
 #[test]
 fn max_timestamp_is_max() {

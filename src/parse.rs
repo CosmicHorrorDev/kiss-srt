@@ -1,20 +1,3 @@
-// NOTE: I'm trying to keep the parser simple, so I'm avoiding a lot of optimizations that would
-// make either maintaining or using it more complex. The provided benchmark shows that the current
-// parser churns through data over 500 MiB/s on my computer, so I don't think there is much use. If
-// for whatever reason you _do_ need a ridiculously fast SRT parser, then these are my
-// recommendations:
-// - Enumerating the lines is used for providing feedback on what line parsing, but is costly
-//   - You could just rip it all out entirely
-//   - You could not keep track unless there is a failure then fallback and reparse to get more info
-// - Each `text` is a `String`, so that involves a lot of allocations
-//   - If you don't need mutations you could just use a `&str`
-//   - If you do need mutations then you could use a `Cow` (potentially a smaller one from `beef`)
-// - `parse_{two,three}_digit_ascii_num` probably isn't optimial
-//   - You could do wrapping shifts by `b'0'`, pack it into a number, and _then_ bounds check
-// - The timestamp line is a fixed length
-//   - You could verify length and then chunk out pieces instead of using an iterator
-//   - Maybe there could be some mask or something for quick validation
-
 use std::str::Bytes;
 
 use crate::{
@@ -93,7 +76,7 @@ fn parse_ts_divider(bytes: &mut Bytes<'_>) -> Option<()> {
 /// Attempts to parse the provided text to a [`Vec`] of [`Subtitle`]s
 ///
 /// ```
-/// # use kiss_srt::{Duration, Subtitle, Timestamp};
+/// # use kiss_srt::{time::{Duration, Timestamp}, Subtitle};
 /// const TEXT: &str = "\
 /// 1
 /// 00:00:00,000 --> 00:00:05,000
@@ -113,7 +96,7 @@ fn parse_ts_divider(bytes: &mut Bytes<'_>) -> Option<()> {
 /// );
 /// ```
 pub fn from_str(subtitles: &str) -> Result<Vec<Subtitle>> {
-    let mut parsed: Vec<Subtitle> = Vec::new();
+    let mut parsed = Vec::new();
     let mut lines = (1..).zip(subtitles.lines());
 
     'outer: while let Some(mut pair) = lines.next() {

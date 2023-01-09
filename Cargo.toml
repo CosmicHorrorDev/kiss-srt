@@ -2,15 +2,16 @@
 name = "kiss-srt"
 version = "0.1.0"
 edition = "2018"
+license = "MIT OR Apache-2.0"
 # TODO: check off this in CI
 rust-version = "1.38.0"
 
-# TODO: license, keywords, desc, etc.
+# TODO: keywords, desc, etc.
 
 [dependencies]
 
 [dev-dependencies]
-criterion = "0.3"
+criterion = { path = "../criterion.rs", default-features = false }
 insta = "1.17"
 oorandom = "11.1.3"
 

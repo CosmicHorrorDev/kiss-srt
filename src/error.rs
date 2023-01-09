@@ -1,3 +1,5 @@
+//! All the possible errors and the context that comes with them
+
 use std::fmt;
 
 /// A specialized [`Result`][std::result::Result] for [`kiss_srt::Error`][Error]
@@ -71,11 +73,11 @@ pub enum ErrorKind {
     InvalidId,
     /// The timestamp line was either missing or had trailing bytes
     InvalidTimestampLine,
-    /// The starting timestamp doesn't match the format of '01:23:45,678'
+    /// The starting timestamp doesn't match the format of `01:23:45,678`
     InvalidTimestampStart,
-    /// The timestamp divider doesn't match ' --> '
+    /// The timestamp divider doesn't match ` --> `
     InvalidTimestampDivider,
-    /// The ending timestamp doesn't match the format of '01:23:45,678'
+    /// The ending timestamp doesn't match the format of `01:23:45,678`
     InvalidTimestampEnd,
     /// The ending timestamp is before the start
     TimestampEndBeforeStart,
