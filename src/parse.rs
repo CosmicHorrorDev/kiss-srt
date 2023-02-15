@@ -76,7 +76,7 @@ fn parse_ts_divider(bytes: &mut Bytes<'_>) -> Option<()> {
 /// Attempts to parse the provided text to a [`Vec`] of [`Subtitle`]s
 ///
 /// ```
-/// # use kiss_srt::{time::{Duration, Timestamp}, Subtitle};
+/// # use kiss_srt::{Duration, Timestamp, Subtitle};
 /// const TEXT: &str = "\
 /// 1
 /// 00:00:00,000 --> 00:00:05,000
@@ -132,7 +132,7 @@ pub fn from_str(subtitles: &str) -> Result<Vec<Subtitle>> {
         }
         let duration = end - start;
         // Trailing bytes
-        if bytes.next() != None {
+        if bytes.next().is_some() {
             return Err(Error::invalid_ts_line(line_num));
         }
 

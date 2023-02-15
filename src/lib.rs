@@ -40,7 +40,7 @@
 //!
 //! // 3. Shifts all the timestamps up by 500ms
 //! for mut subtitle in middle.iter_mut() {
-//!     subtitle.start += kiss_srt::time::Duration::from_millis(500);
+//!     subtitle.start += kiss_srt::Duration::from_millis(500);
 //! }
 //!
 //! // 4. Renders back to SRT text

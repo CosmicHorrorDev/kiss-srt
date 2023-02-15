@@ -87,11 +87,11 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                 sub
             }
             Command::Increase { ms } => {
-                sub.start += kiss_srt::time::Duration::from_millis(ms);
+                sub.start += kiss_srt::Duration::from_millis(ms);
                 sub
             }
             Command::Decrease { ms } => {
-                sub.start -= kiss_srt::time::Duration::from_millis(ms);
+                sub.start -= kiss_srt::Duration::from_millis(ms);
                 sub
             }
         })

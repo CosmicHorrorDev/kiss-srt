@@ -1,4 +1,4 @@
-use kiss_srt::time::Duration;
+use kiss_srt::Duration;
 
 const SANITY: &str = "
 1
