@@ -11,7 +11,7 @@ rust-version = "1.38.0"
 [dependencies]
 
 [dev-dependencies]
-criterion = { path = "../criterion.rs", default-features = false }
+criterion = { version = "0.4.0", default-features = false }
 insta = "1.17"
 oorandom = "11.1.3"
 
